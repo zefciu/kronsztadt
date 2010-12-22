@@ -6,43 +6,40 @@ from kronsztadt.model import meta
 
 def init_model(engine):
     """Call me before using any of the tables or classes in the model"""
-    ## Reflected tables must be defined and mapped here
-    #global reflected_table
-    #reflected_table = sa.Table("Reflected", meta.metadata, autoload=True,
-    #                           autoload_with=engine)
-    #orm.mapper(Reflected, reflected_table)
-    #
     meta.Session.configure(bind=engine)
     meta.engine = engine
 
-
-## Non-reflected tables may be defined and mapped at module level
-#foo_table = sa.Table("Foo", meta.metadata,
-#    sa.Column("id", sa.types.Integer, primary_key=True),
-#    sa.Column("bar", sa.types.String(255), nullable=False),
-#    )
-#
-#class Foo(object):
-#    pass
-#
-#orm.mapper(Foo, foo_table)
-
-thoughts_table = sa.Table(
-    'thoughts', meta.metadata,
-    sa.Column('id', sa.types.Integer(), sa.Sequence('thought_id_seq'), primary_key = True),
-    sa.Column('content', sa.types.UnicodeText()),
-    sa.Column('created', sa.types.DateTime()),
+entries_table = sa.Table(
+    'entries', meta.metadata,
+    sa.Column('id', sa.types.Integer(), sa.Sequence('entries_id_seq'), primary_key = True),
+    sa.Column('slug', sa.types.Unicode(64)),
+    sa.Column('rnd', sa.types.Integer()),
 )
 
-class Thought(object):
-    pass
+translations_table = sa.Table(
+    'translations', meta.metadata,
+    sa.Column('entry_id', sa.types.Integer, sa.ForeignKey('entries.id'), primary_key = True),
+    sa.Column('language', sa.types.String(3), primary_key = True),
+    sa.Column('content', sa.types.UnicodeText()),
+)
 
-orm.mapper(Thought, thoughts_table)
+class Translation(object):
+
+    def __init__(self, language, content):
+        self.language = language
+        self.content = content
 
 
-## Classes for reflected tables may be defined here, but the table and
-## mapping itself must be done in the init_model function
-#reflected_table = None
-#
-#class Reflected(object):
-#    pass
+class Entry(object):
+
+    def __init__(self, slug, translations):
+        self.slug = slug
+        self.rnd = randint(0, 2**16 - 1)
+        self.translations.append(Translation(t, translations[t]))
+
+
+orm.mapper(Entry, entries_table, properties = {
+    'translations': orm.relationship(Translation, backref = 'entry')
+})
+
+orm.mapper(Translation, translations_table)
