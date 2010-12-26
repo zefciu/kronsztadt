@@ -35,7 +35,8 @@ class Entry(object):
     def __init__(self, slug, translations):
         self.slug = slug
         self.rnd = randint(0, 2**16 - 1)
-        self.translations.append(Translation(t, translations[t]))
+        for t in translations:
+            self.translations.append(Translation(t, translations[t]))
 
 
 orm.mapper(Entry, entries_table, properties = {
