@@ -18,8 +18,8 @@ class SlugValidator(fe.FancyValidator):
         'bad_slug': 'This is not a valid slug'
     }
     def validate_python(self, value, state):
-        if re.match('[a-z-]+$', value):
-            raise re.Invalid(self.message('bad_slug', state),
+        if not re.match('[a-z-]+$', value):
+            raise fe.Invalid(self.message('bad_slug', state),
                              value, state
                             )
 
@@ -47,7 +47,7 @@ class EntriesController(BaseController):
                 'rus': self.form_result['content_rus'],
             }
         )
-        m.Session.add(entry)
-        m.Session.commit()
+        m.meta.Session.add(entry)
+        m.meta.Session.commit()
         redirect('/')
 

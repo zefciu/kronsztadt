@@ -5,7 +5,8 @@
 
 <h1>Nowy wpis</h1>
 ${h.form(h.url_for(controller='entries', action='new_entry'), method='post')}
-${h.textarea('content_rus')}
-${h.textarea('content_pol')}
-${h.submit(None, u'Zapisz')}
+${h.text('slug')} <br />
+${h.textarea('content_rus')}<br />
+${h.textarea('content_pol')}<br />
+${h.submit(None, u'Zapisz')}<br />
 ${h.end_form()}

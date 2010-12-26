@@ -1,4 +1,6 @@
 """The application's model objects"""
+from random import randint
+
 import sqlalchemy as sa
 from sqlalchemy import orm
 
