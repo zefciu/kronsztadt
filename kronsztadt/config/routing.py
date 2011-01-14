@@ -20,7 +20,12 @@ def make_map():
 
     # CUSTOM ROUTES HERE
 
-    map.connect('/{controller}/{action}')
-    map.connect('/{controller}/{action}/{id}')
+    map.connect('/new', controller = 'entries', action = 'form')
+    map.connect('/save', controller = 'entries', action = 'new_entry')
+    map.connect('/{slug}', controller = 'entries', action = 'display')
+    map.connect(
+        '/{slug}/{lang}', controller = 'entries', action = 'display'
+    )
+    map.connect('/', controller = 'entries', action = 'random')
 
     return map

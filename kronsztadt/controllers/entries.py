@@ -1,5 +1,6 @@
 import logging
 import re
+from random import randint
 
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
@@ -8,9 +9,11 @@ from pylons.decorators import validate
 from sqlalchemy import sql
 from sqlalchemy import orm
 import formencode as fe
+from routes import url_for
 
 from kronsztadt.lib.base import BaseController, render
 from kronsztadt import model as m
+from kronsztadt.model import meta
 
 log = logging.getLogger(__name__)
 
@@ -35,21 +38,21 @@ class EntriesController(BaseController):
     def random(self):
         while True:
             try:
-                entry = m.Session.query(m.Entry).filter(
-                    Entry.rnd > randint(0, 2**16 - 1)
-                ).limit(1).one()
+                entry = meta.Session.query(m.Entry).filter(
+                    m.Entry.rnd > randint(0, 2**16 - 1)
+                ).order_by(m.Entry.rnd).limit(1).one()
             except orm.exc.NoResultFound:
                 pass
             else:
-                redirect(
-                    controller = 'entries', action = 'get_by_slug',
+                redirect(url_for(
+                    controller = 'entries', action = 'display',
                     slug = entry.slug
-                )
+                ))
 
-    def get_by_slug(self, slug, lang = None):
+    def display(self, slug, lang = None):
         try:
-            entry = m.Session.query(m.Entry).filter(
-                Entry.slug = slug
+            entry = meta.Session.query(m.Entry).filter(
+                m.Entry.slug == slug
             ).limit(1).one()
         except orm.exc.NoResultFound:
             abort(404)
@@ -75,7 +78,10 @@ class EntriesController(BaseController):
                 'rus': self.form_result['content_rus'],
             }
         )
-        m.meta.Session.add(entry)
-        m.meta.Session.commit()
-        redirect('/')
+        meta.Session.add(entry)
+        meta.Session.commit()
+        redirect(url_for(
+            controller = 'entries', action = 'display',
+            slug = self.form_result['slug']
+        ))
 

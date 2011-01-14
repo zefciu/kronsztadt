@@ -39,11 +39,17 @@ class Entry(object):
         while True: # Birtday bound for random key is 300
             self.rnd = randint(0, 2**16 - 1)
             if not meta.Session.query(Entry).filter(
-                Entry.rnd == selfrnd
+                Entry.rnd == self.rnd
             ).count():
                 break
         for t in translations:
             self.translations.append(Translation(t, translations[t]))
+
+    def get_trans(self, lang):
+        for t in self.translations:
+            if t.language == lang:
+                return t
+        return None
 
 
 orm.mapper(Entry, entries_table, properties = {
