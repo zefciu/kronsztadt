@@ -6,6 +6,7 @@ from pylons.controllers.util import abort, redirect
 from pylons.decorators import validate
 
 from sqlalchemy import sql
+from sqlalchemy import orm
 import formencode as fe
 
 from kronsztadt.lib.base import BaseController, render
@@ -31,9 +32,36 @@ class NewEntrySchema(fe.Schema):
 
 class EntriesController(BaseController):
 
-    # def random(self):
-    #     entry = m.Session.query(m.Entry).innerjoin(m.Translation).\
-    #             order_by(sql.functions.random()).limit(1).one()
+    def random(self):
+        while True:
+            try:
+                entry = m.Session.query(m.Entry).filter(
+                    Entry.rnd > randint(0, 2**16 - 1)
+                ).limit(1).one()
+            except orm.exc.NoResultFound:
+                pass
+            else:
+                redirect(
+                    controller = 'entries', action = 'get_by_slug',
+                    slug = entry.slug
+                )
+
+    def get_by_slug(self, slug, lang = None):
+        try:
+            entry = m.Session.query(m.Entry).filter(
+                Entry.slug = slug
+            ).limit(1).one()
+        except orm.exc.NoResultFound:
+            abort(404)
+        if lang is None:
+            for l in request.languages:
+                if l in ['pl', 'pl-pl']:
+                    c.lang = 'pol'
+            else:
+                c.lang = 'rus'
+        c.entry = entry
+        return render('entries/display.mako')
+
 
     def form (self):
         return render('entries/form.mako')

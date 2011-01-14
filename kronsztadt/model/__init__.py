@@ -14,8 +14,8 @@ def init_model(engine):
 entries_table = sa.Table(
     'entries', meta.metadata,
     sa.Column('id', sa.types.Integer(), sa.Sequence('entries_id_seq'), primary_key = True),
-    sa.Column('slug', sa.types.Unicode(64)),
-    sa.Column('rnd', sa.types.Integer()),
+    sa.Column('slug', sa.types.Unicode(64), index = True, unique = True),
+    sa.Column('rnd', sa.types.Integer(), index = True, unique = True),
 )
 
 translations_table = sa.Table(
@@ -36,7 +36,12 @@ class Entry(object):
 
     def __init__(self, slug, translations):
         self.slug = slug
-        self.rnd = randint(0, 2**16 - 1)
+        while True: # Birtday bound for random key is 300
+            self.rnd = randint(0, 2**16 - 1)
+            if not meta.Session.query(Entry).filter(
+                Entry.rnd == selfrnd
+            ).count():
+                break
         for t in translations:
             self.translations.append(Translation(t, translations[t]))
 
