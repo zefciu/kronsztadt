@@ -8,6 +8,7 @@ from pylons import config
 from pylons.middleware import ErrorHandler, StatusCodeRedirect
 from pylons.wsgiapp import PylonsApp
 from routes.middleware import RoutesMiddleware
+from repoze.what.plugins.config import make_middleware_with_config as AuthMiddleware
 
 from kronsztadt.config.environment import load_environment
 
@@ -46,6 +47,10 @@ def make_app(global_conf, full_stack=True, static_files=True, **app_conf):
     app = CacheMiddleware(app, config)
 
     # CUSTOM MIDDLEWARE HERE (filtered by error handling middlewares)
+    app = AuthMiddleware(
+        app, config, app_conf['auth.what_config_file'], 
+        who_config_file = app_conf['auth.who_config_file']
+    )
 
     if asbool(full_stack):
         # Handle Python exceptions
@@ -54,9 +59,9 @@ def make_app(global_conf, full_stack=True, static_files=True, **app_conf):
         # Display error documents for 401, 403, 404 status codes (and
         # 500 when debug is disabled)
         if asbool(config['debug']):
-            app = StatusCodeRedirect(app)
+            app = StatusCodeRedirect(app, [400, 403, 404])
         else:
-            app = StatusCodeRedirect(app, [400, 401, 403, 404, 500])
+            app = StatusCodeRedirect(app, [400, 403, 404, 500])
 
     # Establish the Registry for this application
     app = RegistryManager(app)

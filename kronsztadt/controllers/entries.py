@@ -10,6 +10,8 @@ from sqlalchemy import sql
 from sqlalchemy import orm
 import formencode as fe
 from routes import url_for
+from repoze.what.plugins.pylonshq import ActionProtector
+from repoze.what.predicates import in_group
 
 from kronsztadt.lib.base import BaseController, render
 from kronsztadt import model as m
@@ -26,7 +28,6 @@ class SlugValidator(fe.FancyValidator):
             raise fe.Invalid(self.message('bad_slug', state),
                              value, state
                             )
-
 
 class NewEntrySchema(fe.Schema):
     slug = SlugValidator()
@@ -66,9 +67,11 @@ class EntriesController(BaseController):
         return render('entries/display.mako')
 
 
+    @ActionProtector(in_group('posters'))
     def form (self):
         return render('entries/form.mako')
 
+    @ActionProtector(in_group('posters'))
     @validate(schema = NewEntrySchema, form = 'form')
     def new_entry(self):
         entry = m.Entry(

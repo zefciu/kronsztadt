@@ -24,6 +24,9 @@ beaker.session.key = kronsztadt
 beaker.session.secret = ${app_instance_secret}
 app_instance_uuid = ${app_instance_uuid}
 
+auth.what_config_file = %(here)s/kronsztadt/config/what.ini
+auth.who_config_file = %(here)s/kronsztadt/config/who.ini
+
 # If you'd like to fine-tune the individual locations of the cache data dirs
 # for the Cache data, or the Session saves, un-comment the desired settings
 # here:
