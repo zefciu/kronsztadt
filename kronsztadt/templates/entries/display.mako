@@ -4,6 +4,8 @@
 <%def name="head()">
 </%def>
 
+${h.random_img()}
+
 <%def name="lang_switch(current)" >
 <%
 	txt, new  = ('Polski', 'pol') if current == 'rus' else ('Русский', 'rus')
