@@ -64,9 +64,9 @@ class EntriesController(BaseController):
             else:
                 c.lang = 'rus'
         else:
-            c.lang = lang
+            c.lang = str(lang)
         c.entry = entry
-        return render('entries/display.mako', cache_expire = 3600)
+        return render('entries/display.mako')
 
 
     @ActionProtector(in_group('posters'))
