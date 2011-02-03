@@ -6,7 +6,7 @@
 
 <%def name="lang_switch(current)" >
 <%
-	txt, new  = ('Polski', 'pol') if current == 'rus' else ('Русский', 'rus')
+	txt, new  = ('Polski', 'pol') if current == 'rus' else (u'Русский', 'rus')
 %>
 	${h.link_to(txt, h.url_for(
 			controller = 'entries', action = 'display', slug = c.entry.slug,
@@ -20,7 +20,7 @@
 		${lang_switch(c.lang)}
 		</div>
 		<div>
-			${h.link_to('Losuj' if c.lang == 'pol' else 'Случайный', h.url_for(
+			${h.link_to('Losuj' if c.lang == 'pol' else u'Случайный', h.url_for(
 					controller = 'entries', action = 'random'
 					))}
 		</div>

@@ -24,7 +24,7 @@ class SlugValidator(fe.FancyValidator):
         'bad_slug': 'This is not a valid slug'
     }
     def validate_python(self, value, state):
-        if not re.match('[a-z-]+$', value):
+        if not re.match('[a-z0-9-]+$', value):
             raise fe.Invalid(self.message('bad_slug', state),
                              value, state
                             )
@@ -63,8 +63,10 @@ class EntriesController(BaseController):
                     c.lang = 'pol'
             else:
                 c.lang = 'rus'
+        else:
+            c.lang = lang
         c.entry = entry
-        return render('entries/display.mako')
+        return render('entries/display.mako', cache_expire = 3600)
 
 
     @ActionProtector(in_group('posters'))
