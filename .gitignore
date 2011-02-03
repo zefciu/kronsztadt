@@ -4,3 +4,4 @@ data
 /kronsztadt/config/group.ini
 /kronsztadt/config/passwd
 settings.ini
+kronsztadt/templates/analytics.mako
