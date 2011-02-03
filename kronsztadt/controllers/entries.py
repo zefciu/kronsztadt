@@ -66,7 +66,10 @@ class EntriesController(BaseController):
         else:
             c.lang = str(lang)
         c.entry = entry
-        return render('entries/display.mako')
+        return render(
+                'entries/display.mako', cache_expire = 3600,
+                cache_key = repr((slug, lang))
+                )
 
 
     @ActionProtector(in_group('posters'))
